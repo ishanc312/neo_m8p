@@ -1,0 +1,10 @@
+../Core/Src/neo.c:11:6:NEO_Read	40	static
+../Core/Src/neo.c:23:6:NEO_Command	16	static
+../Core/Src/neo.c:29:6:NEO_Write	24	static
+../Core/Src/neo.c:36:6:pollVersion	24	static
+../Core/Src/neo.c:41:6:enableGPS	32	static
+../Core/Src/neo.c:51:6:enableAutomotiveMode	56	static
+../Core/Src/neo.c:62:6:getSubframe	64	static
+../Core/Src/neo.c:70:6:clearConfig	32	static
+../Core/Src/neo.c:79:6:saveConfig	32	static
+../Core/Src/neo.c:88:6:loadConfig	32	static
