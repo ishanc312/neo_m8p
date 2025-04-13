@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "neo.h"
+#include "string.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,6 +48,9 @@
 
 uint8_t rxData[100];
 uint16_t rxLen = 100;
+uint8_t dummyWrite[100];
+float data[2];
+int status;
 
 /* USER CODE END PV */
 
@@ -95,17 +99,15 @@ int main(void)
 
   uint8_t txData[8] = {0xB5, 0x62, 0x01, 0x07, 0x00, 0x00, 0x08, 0x19};
   uint16_t txLen = 8;
+  memset(dummyWrite, 0xFF, 100);
 
   HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
-  // Ensure that SCK is working...
-  // Ensure that SPI MOSI Pin sends desired request next
   HAL_SPI_Transmit(&hspi3, txData, txLen, HAL_MAX_DELAY);
-
-  // NEED TO ADJUST THE TIMING TO CATCH THE BEGINNING OF THE RESPONSE!!!
   HAL_Delay(1000);
-  HAL_SPI_Receive(&hspi3, rxData, rxLen, HAL_MAX_DELAY);
+  HAL_SPI_TransmitReceive(&hspi3, dummyWrite, rxData, rxLen, HAL_MAX_DELAY);
   HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_SET);
 
+  status = NAV_PVT_PARSE(rxData, data);
 
   /* USER CODE END 2 */
 

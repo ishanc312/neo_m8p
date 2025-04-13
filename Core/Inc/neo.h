@@ -15,5 +15,6 @@
 #define NEO_CS_PIN GPIO_PIN_6
 
 void computeChecksum(uint8_t* payload, uint16_t len, uint8_t* ck_a, uint8_t* ck_b);
+int NAV_PVT_PARSE(uint8_t* rxData, float* data);
 
 #endif /* INC_NEO_H_ */
