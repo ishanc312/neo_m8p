@@ -202,6 +202,8 @@ int main(void)
  8000260:	f04f 33ff 	mov.w	r3, #4294967295	@ 0xffffffff
  8000264:	480c      	ldr	r0, [pc, #48]	@ (8000298 <main+0x6c>)
  8000266:	f001 fc00 	bl	8001a6a <HAL_SPI_Transmit>
+
+  // NEED TO ADJUST THE TIMING TO CATCH THE BEGINNING OF THE RESPONSE!!!
   HAL_Delay(1000);
  800026a:	f44f 707a 	mov.w	r0, #1000	@ 0x3e8
  800026e:	f000 f9fd 	bl	800066c <HAL_Delay>
@@ -212,7 +214,6 @@ int main(void)
  800027a:	4909      	ldr	r1, [pc, #36]	@ (80002a0 <main+0x74>)
  800027c:	4806      	ldr	r0, [pc, #24]	@ (8000298 <main+0x6c>)
  800027e:	f001 fd6a 	bl	8001d56 <HAL_SPI_Receive>
-  // Check the SPI MISO Pin to see after a certain (variable) time it responds....
   HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_SET);
  8000282:	2201      	movs	r2, #1
  8000284:	2140      	movs	r1, #64	@ 0x40

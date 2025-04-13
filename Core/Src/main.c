@@ -100,9 +100,10 @@ int main(void)
   // Ensure that SCK is working...
   // Ensure that SPI MOSI Pin sends desired request next
   HAL_SPI_Transmit(&hspi3, txData, txLen, HAL_MAX_DELAY);
+
+  // NEED TO ADJUST THE TIMING TO CATCH THE BEGINNING OF THE RESPONSE!!!
   HAL_Delay(1000);
   HAL_SPI_Receive(&hspi3, rxData, rxLen, HAL_MAX_DELAY);
-  // Check the SPI MISO Pin to see after a certain (variable) time it responds....
   HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_SET);
 
 
