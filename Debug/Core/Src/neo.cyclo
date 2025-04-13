@@ -1,10 +1,1 @@
-../Core/Src/neo.c:11:6:NEO_Read	2
-../Core/Src/neo.c:23:6:NEO_Command	1
-../Core/Src/neo.c:29:6:NEO_Write	2
-../Core/Src/neo.c:36:6:pollVersion	1
-../Core/Src/neo.c:41:6:enableGPS	1
-../Core/Src/neo.c:51:6:enableAutomotiveMode	1
-../Core/Src/neo.c:62:6:getSubframe	1
-../Core/Src/neo.c:70:6:clearConfig	1
-../Core/Src/neo.c:79:6:saveConfig	1
-../Core/Src/neo.c:88:6:loadConfig	1
+../Core/Src/neo.c:11:6:computeChecksum	2

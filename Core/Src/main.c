@@ -20,11 +20,10 @@
 #include "main.h"
 #include "spi.h"
 #include "gpio.h"
-#include "neo.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "neo.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,6 +44,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
+uint8_t rxData[100];
+uint16_t rxLen = 100;
 
 /* USER CODE END PV */
 
@@ -89,8 +91,20 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI3_Init();
-
   /* USER CODE BEGIN 2 */
+
+  uint8_t txData[8] = {0xB5, 0x62, 0x01, 0x07, 0x00, 0x00, 0x08, 0x19};
+  uint16_t txLen = 8;
+
+  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
+  // Ensure that SCK is working...
+  // Ensure that SPI MOSI Pin sends desired request next
+  HAL_SPI_Transmit(&hspi3, txData, txLen, HAL_MAX_DELAY);
+  HAL_Delay(1000);
+  HAL_SPI_Receive(&hspi3, rxData, rxLen, HAL_MAX_DELAY);
+  // Check the SPI MISO Pin to see after a certain (variable) time it responds....
+  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_SET);
+
 
   /* USER CODE END 2 */
 
