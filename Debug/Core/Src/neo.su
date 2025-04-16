@@ -1,2 +1,2 @@
 ../Core/Src/neo.c:11:6:computeChecksum	32	static
-../Core/Src/neo.c:21:5:NAV_PVT_PARSE	40	static
+../Core/Src/neo.c:22:5:PVT_PARSE	40	static

@@ -49,6 +49,8 @@ uint8_t pollPVT[8] = {0xB5, 0x62, 0x01, 0x07, 0x00, 0x00, 0x08, 0x19};
 uint8_t txData[100];
 uint8_t rxData[100];
 uint16_t len = 100;
+float coords[2];
+int status;
 
 /* USER CODE END PV */
 
@@ -105,6 +107,8 @@ int main(void)
   HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
   HAL_SPI_TransmitReceive(&hspi3, txData, rxData, len, HAL_MAX_DELAY);
   HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
+
+  status = PVT_PARSE(rxData, coords);
   /* USER CODE END 2 */
 
   /* Infinite loop */
