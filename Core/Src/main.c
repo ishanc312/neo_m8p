@@ -45,12 +45,10 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+uint8_t pollPVT[8] = {0xB5, 0x62, 0x01, 0x07, 0x00, 0x00, 0x08, 0x19};
+uint8_t txData[100];
 uint8_t rxData[100];
-uint16_t rxLen = 100;
-uint8_t dummyWrite[100];
-float data[2];
-int status;
+uint16_t len = 100;
 
 /* USER CODE END PV */
 
@@ -95,20 +93,18 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI3_Init();
+
   /* USER CODE BEGIN 2 */
-
-  uint8_t txData[8] = {0xB5, 0x62, 0x01, 0x07, 0x00, 0x00, 0x08, 0x19};
-  uint16_t txLen = 8;
-  memset(dummyWrite, 0xFF, 100);
-
   HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
-  HAL_SPI_Transmit(&hspi3, txData, txLen, HAL_MAX_DELAY);
-  HAL_Delay(1000);
-  HAL_SPI_TransmitReceive(&hspi3, dummyWrite, rxData, rxLen, HAL_MAX_DELAY);
+  HAL_SPI_Transmit(&hspi3, pollPVT, 8, HAL_MAX_DELAY);
   HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_SET);
 
-  status = NAV_PVT_PARSE(rxData, data);
+  HAL_Delay(1000);
 
+  memset(txData, 0xFF, len);
+  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
+  HAL_SPI_TransmitReceive(&hspi3, txData, rxData, len, HAL_MAX_DELAY);
+  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
   /* Infinite loop */

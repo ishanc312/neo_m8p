@@ -20,17 +20,15 @@ void computeChecksum(uint8_t* payload, uint16_t len, uint8_t* ck_a, uint8_t* ck_
 
 int NAV_PVT_PARSE(uint8_t* rxData, float* data) {
 	int status = -1;
-
-	if (rxData[0] == 0xB5 && rxData[1] == 0x62 && rxData[2] == 0x01 && rxData[3] == 0x07) {
+	if (rxData[1] == 0x62 && rxData[2] == 0x01 && rxData[3] == 0x07) {
 		// Ensure a correct header
 		status = 0;
-	}
 
-	if (rxData[20] > 0) {
-		status = 1;
-		// Means the satellite got a fix!
+		if (rxData[20] > 0) {
+			status = 1;
+			// Means the satellite got a fix!
+		}
 	}
-
 	int32_t unscaled_lon = (int32_t)((rxData[24] << 24) | (rxData[25] << 16) | (rxData[26] << 8) | (rxData[27]));
 	float lon = unscaled_lon * 1e-7;
 	int32_t unscaled_lat = (int32_t)((rxData[28] << 24) | (rxData[29] << 16) | (rxData[30] << 8) | (rxData[31]));
