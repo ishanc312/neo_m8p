@@ -57,16 +57,57 @@ uint16_t dummyLen = 1000;
 float coords[2];
 int status;
 
+CAN_TxHeaderTypeDef NE_Vel_CTXHeader;
+HAL_StatusTypeDef NE_Vel_Status;
+
+CAN_TxHeaderTypeDef DHeading_CTXHeader;
+HAL_StatusTypeDef DHeading_Status;
+
+#define NE_Vel_ID 0x771;
+#define DHeading_ID 0x781;
+
+uint8_t NE_Vel_Tx[8];
+uint8_t DHeading_Tx[8];
+
+uint32_t mailbox;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-void flushRx();
+void formNE_Vel_Frame();
+void formDHeading_Frame();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void formNE_Vel_Frame() {
+	// North Velocity
+	NE_Vel_Tx[0] = rxData[54];
+	NE_Vel_Tx[1] = rxData[55];
+	NE_Vel_Tx[2] = rxData[56];
+	NE_Vel_Tx[3] = rxData[57];
+
+	// East Velocity
+	NE_Vel_Tx[4] = rxData[58];
+	NE_Vel_Tx[5] = rxData[59];
+	NE_Vel_Tx[6] = rxData[60];
+	NE_Vel_Tx[7] = rxData[61];
+}
+
+void formDHeading_Frame() {
+	// Down Velocity
+	DHeading_Tx[0] = rxData[62];
+	DHeading_Tx[1] = rxData[63];
+	DHeading_Tx[2] = rxData[64];
+	DHeading_Tx[3] = rxData[65];
+
+	// Heading Direction (need to scale by 1e-5)
+	DHeading_Tx[4] = rxData[70];
+	DHeading_Tx[5] = rxData[71];
+	DHeading_Tx[6] = rxData[72];
+	DHeading_Tx[7] = rxData[73];
+}
 
 /* USER CODE END 0 */
 
@@ -101,10 +142,23 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI3_Init();
   MX_CAN1_Init();
+
+  HAL_CAN_Start(&hcan1);
   /* USER CODE BEGIN 2 */
 
   memset(txData, 0xFF, len);
   memset(dummyTx, 0xFF, dummyLen);
+
+  NE_Vel_CTXHeader.IDE = CAN_ID_STD;
+  NE_Vel_CTXHeader.StdId = NE_Vel_ID;
+  NE_Vel_CTXHeader.RTR = CAN_RTR_DATA;
+  NE_Vel_CTXHeader.DLC = 8;
+
+  DHeading_CTXHeader.IDE = CAN_ID_STD;
+  DHeading_CTXHeader.StdId = DHeading_ID;
+  DHeading_CTXHeader.RTR = CAN_RTR_DATA;
+  DHeading_CTXHeader.DLC = 8;
+
 
   /* USER CODE END 2 */
 
@@ -123,6 +177,14 @@ int main(void)
 	  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_SET);
 
 	  status = PVT_PARSE(rxData, coords);
+
+	  if (status == 1) {
+		  formNE_Vel_Frame();
+		  formDHeading_Frame();
+
+		  NE_Vel_Status = HAL_CAN_AddTxMessage(&hcan1, &NE_Vel_CTXHeader, NE_Vel_Tx, &mailbox);
+		  DHeading_Status = HAL_CAN_AddTxMessage(&hcan1, &DHeading_CTXHeader, DHeading_Tx, &mailbox);
+	  }
 
 	  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
 	  HAL_SPI_TransmitReceive(&hspi3, dummyTx, dummyRx, 1000, HAL_MAX_DELAY);
