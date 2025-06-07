@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "can.h"
 #include "spi.h"
 #include "gpio.h"
 
@@ -49,6 +50,10 @@ uint8_t pollPVT[8] = {0xB5, 0x62, 0x01, 0x07, 0x00, 0x00, 0x08, 0x19};
 uint8_t txData[100];
 uint8_t rxData[100];
 uint16_t len = 100;
+
+uint8_t dummyTx[1000];
+uint8_t dummyRx[1000];
+uint16_t dummyLen = 1000;
 float coords[2];
 int status;
 
@@ -57,7 +62,7 @@ int status;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+void flushRx();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -95,26 +100,33 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI3_Init();
-
+  MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
-  HAL_SPI_Transmit(&hspi3, pollPVT, 8, HAL_MAX_DELAY);
-  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_SET);
-
-  HAL_Delay(1000);
 
   memset(txData, 0xFF, len);
-  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
-  HAL_SPI_TransmitReceive(&hspi3, txData, rxData, len, HAL_MAX_DELAY);
-  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
+  memset(dummyTx, 0xFF, dummyLen);
 
-  status = PVT_PARSE(rxData, coords);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
+	  HAL_SPI_Transmit(&hspi3, pollPVT, 8, HAL_MAX_DELAY);
+	  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_SET);
+
+	  HAL_Delay(100);
+
+	  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
+	  HAL_SPI_TransmitReceive(&hspi3, txData, rxData, len, HAL_MAX_DELAY);
+	  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_SET);
+
+	  status = PVT_PARSE(rxData, coords);
+
+	  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_RESET);
+	  HAL_SPI_TransmitReceive(&hspi3, dummyTx, dummyRx, 1000, HAL_MAX_DELAY);
+	  HAL_GPIO_WritePin(NEO_CS_PORT, NEO_CS_PIN, GPIO_PIN_SET);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -144,7 +156,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = 0;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_7;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
