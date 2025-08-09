@@ -1,0 +1,1 @@
+A simple SPI driver to interface with the u-blox NEO-M8P GPS Module, connected to an STM32 L432KCU3 as part of the DAQ Units for the Bruin Formula Mk. 10 Vehicle. This is not a full-fledged driver, instead only obtaining necessary information about vehicle heading and velocity with integrated CAN Transmission.
